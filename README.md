@@ -1,2 +1,2 @@
 # materials
-FPGA course
+FPGA course and other materials for students
