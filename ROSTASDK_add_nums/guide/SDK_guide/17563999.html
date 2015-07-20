@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Руководство пользователя SDK RC-47 1.0 : AXI подсистема</title>
+        <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body class="theme-default aui-theme-default">
+        <div id="page">
+            <div id="main" class="aui-page-panel">
+                <div id="main-header">
+                    <div id="breadcrumb-section">
+                        <ol id="breadcrumbs">
+                            <li class="first">
+                                <span><a href="index.html">Руководство пользователя SDK RC-47 1.0</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="17563997.html">Программное обеспечение ПЛИС Virtex-7</a></span>
+                            </li>
+                                                </ol>
+                    </div>
+                    <h1 id="title-heading" class="pagetitle">
+                                                <span id="title-text">
+                            Руководство пользователя SDK RC-47 1.0 : AXI подсистема
+                        </span>
+                    </h1>
+                </div>
+
+                <div id="content" class="view">
+                    <div class="page-metadata">
+                        
+        
+    
+        
+    
+        
+    
+            Created by <span class='author'> Yuri Rumyantsev</span>, last modified by <span class='editor'> Sergey Torchigin</span> on Apr 27, 2015
+                        </div>
+                    <div id="main-content" class="wiki-content group">
+                    <p>Внешняя DDR3 память, установленная на модуле EM4-DDR3 подключается к двум &quot;банкам&quot; ПЛИС. Для каждого &quot;банка&quot; внутри ПЛИС реализован свой контроллер на базе Xilinx IP ядра MIG - Top и Bottom. Эти контроллеры подключаются к внутрикристалльной шине AXI, на которой они имеют адреса</p><ul><li>TOP: 0x20000000 - 0x3FFFFFFF (512 MB)</li><li>BTM: 0x40000000 - 0x5FFFFFFF (512 MB)</li></ul><p>Для доступа к AXI шине через PCI Express используется ядро Stream-AXI Bridge, основанное на Xilinx Datamover IP и управляющей логики собственной разработки. Адресное пространство AXI не отображено в память хост-компьютера через BARы, вместо этого используется протокол записи/чтения через очереди RX_FIFO и TX_FIFO (использующиеся для передачи данных хост-ПЛИС в режиме DMA). Данный протокол реализуется совместно использованием ядра Stream-AXI Bridge и функций библиотеки API RC-47</p><p>fpga_write_to_axi()</p><p>fpga_read_from_axi()</p><p>
+
+<map id="gliffy-map-17564001-3237" name="gliffy-map-17564001-3237"></map>
+<table width="100%" class="gliffy-macro-table">
+    <tr>
+        <td >
+            <table class="gliffy-macro-inner-table">
+                <caption align="bottom">
+                                    </caption>
+                <tr>
+                    <td>
+                        <img style="border: none; width: 667px;" usemap="#gliffy-map-17564001-3237" src="attachments/17563999/17564000.png" alt="" class="gliffy-macro-image"/>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+</p><p> </p><p>AXI подсистема создается автоматически при создании Vivado проекта с помощью файла ./src/create_bd.tcl, который вызывается сценарием ./src/create_project.tcl проекта rc_pcie_ddr_2000_12. </p><p> </p><p><span class="scroll-pi"  style="display:none;" type="pagebreak"></span></p>
+                    </div>
+
+                                        <div class="pageSection group">
+                        <div class="pageSectionHeader">
+                            <h2 id="attachments" class="pageSectionTitle">Attachments:</h2>
+                        </div>
+
+                        <div class="greybox" align="left">
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/17563999/17564003">hls_core1</a> (application/gliffy+json)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/17563999/17564002.png">hls_core1.png</a> (image/png)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/17563999/17564001">prog_model</a> (application/gliffy+json)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/17563999/17564000.png">prog_model.png</a> (image/png)
+                                <br/>
+                                                    </div>
+                    </div>
+                    
+                 
+                </div>             </div> 
+            <div id="footer" role="contentinfo">
+                <section class="footer-body">
+                    <p>Document generated by Confluence on Jul 20, 2015 13:39</p>
+                    <div id="footer-logo"><a href="http://www.atlassian.com/">Atlassian</a></div>
+                </section>
+            </div>
+        </div>     </body>
+</html>

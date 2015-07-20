@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Руководство пользователя SDK RC-47 1.0 : Программное обеспечение ПЛИС Virtex-7</title>
+        <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body class="theme-default aui-theme-default">
+        <div id="page">
+            <div id="main" class="aui-page-panel">
+                <div id="main-header">
+                    <div id="breadcrumb-section">
+                        <ol id="breadcrumbs">
+                            <li class="first">
+                                <span><a href="index.html">Руководство пользователя SDK RC-47 1.0</a></span>
+                            </li>
+                                                </ol>
+                    </div>
+                    <h1 id="title-heading" class="pagetitle">
+                                                <span id="title-text">
+                            Руководство пользователя SDK RC-47 1.0 : Программное обеспечение ПЛИС Virtex-7
+                        </span>
+                    </h1>
+                </div>
+
+                <div id="content" class="view">
+                    <div class="page-metadata">
+                        
+        
+    
+        
+    
+        
+    
+            Created by <span class='author'> Yuri Rumyantsev</span>, last modified by <span class='editor'> Natasha Abrashitova</span> on Jul 20, 2015
+                        </div>
+                    <div id="main-content" class="wiki-content group">
+                    <p>В данном разделе описываются проекты ПЛИС Virtex-7, входящие в SDK RC-47 версии 1.0.</p><p><span class="scroll-pi"  style="display:none;Scroll Tip" widths="$paramwidths" type="tablelayout"></span></p><div class="table-wrap"><table class="confluenceTable"><tbody><tr><th class="confluenceTh">Название проекта</th><th class="confluenceTh">Описание проета</th></tr><tr><td class="confluenceTd">rc_pcie_base_2000_9 </td><td class="confluenceTd">базовый ПЛИС проект, являющийся стартовым при включении питания блока. На этом проекте работают прикладные программы rc47_pcie_test и rc47_pcie_speed_test</td></tr><tr><td class="confluenceTd">rc_pcie_ddr_2000_12 </td><td class="confluenceTd">ПЛИС проект, использующийся для тестирования памяти на модуле EM4-DDR3. Включает в себя внутрикристальную шину AXI, созданную с помощью инструмента Vivado Block Design. На этом проекте работает прикладная программа rc47_axi_ddr</td></tr><tr><td class="confluenceTd">rc_pcie_stress_2000_8_clk100_def_ff_u82 </td><td class="confluenceTd">ПЛИС проект для работы прикладной программы rc47_stress_test</td></tr></tbody></table></div><p> </p><p>Все проекты создаются в среде Xilinx Vivado 2014.2. Сборка и отладка проектов производилась в ОС Windwos 7 64bits.  </p><p>Проект rc_pcie_stress_2000_8_clk100_def_ff_u82 распространяется в виде стандартного Vivado GUI проекта. В противоположность этому rc_pcie_base_2000_9 и rc_pcie_ddr_2000_12 поставляются в виде только исходных файлов, а также TCL скрипта для автоматического создания GUI проекта и имеют следующую структуру файлов в директории.</p><ul><li>Директория src - <span style="line-height: 1.4285715;">место расположения исходных RTL, XDC и XCI (IP ядра) файлов</span></li><li>Директория project - в этой директории создается GUI проект Vivado<ul><li>файл create_project.tcl - TCL сценарий автоматически создает Vivado проект и добавляет в него файлы из директории ../src</li><li>файл create_project.bat - сценарий windows, открывающий Vivado в batch режиме и вызывающий файл  create_project.tcl</li></ul></li></ul><p> </p><p>Помимо этого проект rc_pcie_base_2000_9 может собираться по методологии Design Reuse (см. Vivado Design Suite User Guide Hierarchical Design UG905, Vivado Design Suite Tutorial Hierarchical Design UG946), когда из всего ПЛИС проекта выделяется интерфейсная статическая часть (Base IP) и пользовательская логика (User IP). Base IP не меняется при изменении User IP и его физического размещение на кристалле может быть фиксировано для </p><ul><li>гарантии, что в base ip не будет временных ошибок при последующих сборках проекта</li><li>ускорении сборки проекта</li></ul><p>Для поддержки этого режима сборки в директории проекта есть следующие дополнительные директории и файлы</p><ul><li>Директория Checkpoint - место расположения файла rosta_route_design.dcp, содержащего информацию о физического размещении блока Base IP. </li><li>Директория tcl - набор TCL сценариев, использующихся для сборки проекта по методологии Design Reuse</li><li>файл design.tcl - исполняемый TCL сценарий &quot;верхнего&quot; уровня, управляющий сборкой проекта</li><li>файл run_design_tcl.bat - сценарий Windows, вызывающий Vivado в batch режиме и исполняющий design.tcl</li><li>файл readme_tcl.txt - короткая инструкция по работе с проектом по методологии Design Reuse</li></ul><p> </p><p>Далее в этом разделе описывается интерфейсная часть (Base IP), входящая во все ПЛИС проекты, а также подсистема AXI шины для поддержки внешней памяти на моделу EM4-DD3, входящая в проект <span>rc_pcie_ddr_2000_12. </span></p><p> </p><p><span class="scroll-pi"  style="display:none;" type="pagebreak"></span></p><p> </p>
+                    </div>
+
+                    
+                 
+                </div>             </div> 
+            <div id="footer" role="contentinfo">
+                <section class="footer-body">
+                    <p>Document generated by Confluence on Jul 20, 2015 13:39</p>
+                    <div id="footer-logo"><a href="http://www.atlassian.com/">Atlassian</a></div>
+                </section>
+            </div>
+        </div>     </body>
+</html>

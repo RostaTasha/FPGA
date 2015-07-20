@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Руководство пользователя SDK RC-47 1.0 : Набор утилит для перепрограммирования ПЗУ на плате RC-47</title>
+        <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body class="theme-default aui-theme-default">
+        <div id="page">
+            <div id="main" class="aui-page-panel">
+                <div id="main-header">
+                    <div id="breadcrumb-section">
+                        <ol id="breadcrumbs">
+                            <li class="first">
+                                <span><a href="index.html">Руководство пользователя SDK RC-47 1.0</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="17564004.html">Программное обеспечение хост-компьютера</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="17564006.html">Утилиты</a></span>
+                            </li>
+                                                </ol>
+                    </div>
+                    <h1 id="title-heading" class="pagetitle">
+                                                <span id="title-text">
+                            Руководство пользователя SDK RC-47 1.0 : Набор утилит для перепрограммирования ПЗУ на плате RC-47
+                        </span>
+                    </h1>
+                </div>
+
+                <div id="content" class="view">
+                    <div class="page-metadata">
+                        
+        
+    
+        
+    
+        
+    
+            Created by <span class='author'> Yuri Rumyantsev</span>, last modified by <span class='editor'> Sergey Torchigin</span> on Apr 27, 2015
+                        </div>
+                    <div id="main-content" class="wiki-content group">
+                    <p>На плате RC-47 расположена карта памяти microSD на которой хранятся конфигурационные данные для ПЛИС Virtex-7 и системной ПЛИС платы RC-47. <span> Данное ПЗУ можно перепрограммировать с хост-компьютера через PCI Express интерфейс средствами SDK RC-47 и ВПО платы RC-47. Конфигурационные файлы для системной ПЛИС и ПЛИС Virtex7 содержаться на карте microSD в специальном формате. </span>Для приведения конфигурационных данных для ПЛИС к определенному формату и записи их на карту microSD были разработаны специальные утилиты.</p><h2 id="id-НаборутилитдляперепрограммированияПЗУнаплатеRC-47-СозданиефайлаобразакартыПЗУ">Создание файла образа карты ПЗУ</h2><p>Утилита формирует по определенному формату файл прошивки для  ПЗУ из файлов  *.bit для Virtex-7 и Spartan-6 и записывает его на карту microSD расположенную на выбранной плате RC-47. </p><h3 id="id-НаборутилитдляперепрограммированияПЗУнаплатеRC-47-ВызоввОСLinux">Вызов  в ОС Linux</h3><p><span>Запустить утилиту &quot;Создание файла образа карты ПЗУ&quot; на хост-компьютере из ОС Linux можно, набрав в командной строке следующее: </span></p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: java; gutter: false" style="font-size:12px;">$ cd $ROSTA_SDK_DIR/lin/utilities
+$ ./rc47_build_sd -sp6 [path_to_sp6_file] -v7 485 all [path_to_v7_file] -o [output_file_name]</pre>
+</div></div><p>где  path_to_sp6_file  - путь к файлу конфигурации для Spartan 6  *.bit,  path_to_v7_file  - путь к файлу конфигурации для Virtex 7   *.bit,  output_file_name - имя файла прошивки для  microSD карты</p><div class="confluence-information-macro confluence-information-macro-information">
+    
+            <span class="aui-icon aui-icon-small aui-iconfont-info confluence-information-macro-icon"></span>
+    
+    <div class="confluence-information-macro-body"><p>Ключи 485 и all являются обязательными в данной версии sdk.</p></div>    </div>
+<h3 id="id-НаборутилитдляперепрограммированияПЗУнаплатеRC-47-Входныеивыходныеданные"><span>Входные и выходные данные</span></h3><p>Входными данными для утилиты являются путь к файлу конфигурации для Spartan 6,  путь к файлу конфигурации  для Virtex 7   , выходные данные -  информация об успешном завершении формирования файла для ПЗУ.</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: xml; gutter: false" style="font-size:12px;">$ROSTA_SDK_DIR/lin/utilities$ sudo ./rc47_build_sd -sp6 $ROSTA_SDK_DIR/bit-files/s6_ver10.bit -v7 485 all $ROSTA_SDK_DIR/bit-files/rc_pcie_base_2000_8.bit -o ./sd_file
+Start building SD file
+sp: $ROSTA_SDK_DIR/bit-files/s6_ver10.bit
+v7: $ROSTA_SDK_DIR/bit-files/rc_pcie_base_2000_8.bit
+v7 description: 11
+sp6_bit_length = 1104496
+v7_bit_length = 4994915
+write sp6 file to sd image
+
+write v7 file to sd image</pre>
+</div></div><h2 id="id-НаборутилитдляперепрограммированияПЗУнаплатеRC-47-ЗагрузкафайлавПЗУ">Загрузка файла в ПЗУ</h2><p>Утилита записывает файл образа карты ПЗУ на карту microSD платы RC-47 по шине PCI Express.</p><h3 id="id-НаборутилитдляперепрограммированияПЗУнаплатеRC-47-ВызоввОСLinux.1">Вызов  в ОС Linux</h3><p>Запустить утилиту &quot;Загрузка файла в ПЗУ&quot; на хост-компьютере из ОС Linux можно, набрав в командной строке следующее: </p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: java; gutter: false" style="font-size:12px;">$ cd $ROSTA_SDK_DIR/lin/utilities
+$ sudo ./rc47_load_sd -b [board] -f [path_to_file] -verify</pre>
+</div></div><div><div class="syntaxhighlighter nogutter  java"><p><span>где board - номер платы в системе,  path_to_file  - путь к файлу конфигурации *.bit,  ключ -verify указывается для  проверки записанных данных (данные читаются и сравниваются с отправленными)</span></p></div></div><h3 id="id-НаборутилитдляперепрограммированияПЗУнаплатеRC-47-Входныеивыходныеданные.1"><span>Входные и выходные данные</span></h3><p>Входными данными для утилиты являются номер платы  в системе и путь к файлу для microSD карты  , выходные данные -  информация об успешности  перепрограммирования ПЗУ и затраченное время.</p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="theme: Confluence; brush: xml; gutter: false" style="font-size:12px;">$ROSTA_SDK_DIR/lin/utilities$ sudo ./rc47_load_sd  -b 0 -f ./sd_file  -verify
+Searching for RC47 boards
+Found 1 board
+
+File to load to SD card = ./sd_file
+file length = 9318039
+code is 19841211
+Start programming SD card by blocks of 12.0 KB
+ 97% [================================================  ]
+SD card programming completed successfully
+ *** SD card programming ended over 76.2 sec</pre>
+</div></div><p><span class="scroll-pi"  style="display:none;" type="pagebreak"></span></p><p> </p>
+                    </div>
+
+                    
+                 
+                </div>             </div> 
+            <div id="footer" role="contentinfo">
+                <section class="footer-body">
+                    <p>Document generated by Confluence on Jul 20, 2015 13:39</p>
+                    <div id="footer-logo"><a href="http://www.atlassian.com/">Atlassian</a></div>
+                </section>
+            </div>
+        </div>     </body>
+</html>
