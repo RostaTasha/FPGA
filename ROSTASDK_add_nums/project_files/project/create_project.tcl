@@ -1,7 +1,7 @@
 
 
 set part "xc7v2000tfhg1761-1"
-set project_name "rc_pcie_base_2000_10"
+set project_name "rc_pcie_base_2000_11"
 set top_entity	$project_name
 
 set orgDir ".."

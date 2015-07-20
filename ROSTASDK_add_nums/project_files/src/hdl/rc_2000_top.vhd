@@ -17,7 +17,7 @@ use unisim.vcomponents.all;
 use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 
-entity rc_pcie_base_2000_10 is
+entity rc_pcie_base_2000_11 is
   port (
 	pci_exp_txp	: out std_logic_vector(3 downto 0);
 	pci_exp_txn	: out std_logic_vector(3 downto 0);
@@ -43,9 +43,9 @@ entity rc_pcie_base_2000_10 is
     aclk_p      : in std_logic; -- user diff.clock - 100 mhz
     aclk_n      : in std_logic
 );
-end rc_pcie_base_2000_10;
+end rc_pcie_base_2000_11;
 
-architecture base of rc_pcie_base_2000_10 is
+architecture base of rc_pcie_base_2000_11 is
 
 
 attribute buffer_type : string;
