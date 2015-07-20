@@ -1,0 +1,4 @@
+vhdl work "hdl/blackbox/base_ip_bb.vhd"
+vhdl work "hdl/user/user_ip.vhd"
+vhdl work "hdl/rc_2000_top.vhd"
+

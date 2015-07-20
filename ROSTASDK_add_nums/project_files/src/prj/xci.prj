@@ -1,0 +1,16 @@
+# File, containing list of IP cores added "by hand" to project (not by Block Design)
+# without ".xci" extension
+# Is used by script ./tcl/clean_src.tcl
+clk_wiz
+cmd_fifo
+fifo_1k_32
+fifo_from_user_ip
+fifo_to_user_ip
+pcie_7x_0
+rx_fifo
+tx_fifo
+s6_v7
+v7_s6
+axis_cc_buf
+ep_rx_fifo
+ep_tx_fifo
