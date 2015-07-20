@@ -1,7 +1,0 @@
-vhdl work "hdl/base/rr_arbiter.vhd"
-vhdl work "hdl/base/reg_synch.vhd"
-vhdl work "hdl/base/pcie_64b_master_ea.vhd"
-vhdl work "hdl/base/pcie_app_7x.vhd"
-verilog work "hdl/base/pcie_7x_0_pipe_clock.v"
-vhdl work "hdl/base/cbus.vhd"
-vhdl work "hdl/base/base_ip.vhd"
