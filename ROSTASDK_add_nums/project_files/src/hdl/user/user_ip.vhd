@@ -186,7 +186,10 @@ constant TestRegOut             : std_logic_vector(7 downto 0) :=X"30";
 
 constant MaxWordsCnt            : std_logic_vector(7 downto 0)      :=X"48";
 
-
+-- Add test
+constant Val1                   : std_logic_vector(7 downto 0) :=X"4C";
+constant Val2                   : std_logic_vector(7 downto 0) :=X"50";
+constant ValSumm                : std_logic_vector(7 downto 0) :=X"54";
 
 -- DWORD SWAP BYTE function : ( big-endian -> little-endian )   -- DONE in DMA master unit
 -- host_rd(31 downto 0):= trn_rd(7 downto 0)& trn_rd(15 downto 8)& trn_rd(23 downto 16)& trn_rd(31 downto 24); 
@@ -282,6 +285,10 @@ signal cnt_rst_n: std_logic;
 signal start: std_logic_vector(1 downto 0);
 signal state: std_logic_vector(1 downto 0);
 
+signal val1_data : std_logic_vector(31 downto 0);
+signal val2_data : std_logic_vector(31 downto 0);
+signal val_summ : std_logic_vector(31 downto 0);
+
 
 attribute KEEP : string;
 --attribute KEEP of TxStatus_c          : signal is "TRUE";
@@ -337,6 +344,9 @@ begin
                 TestRegOut_c    <= (others => '0');
                 test_data_set   <= '0'; 
                 len_cnt<= (others => '0');
+                val_summ<= (others => '0');
+                val1_data<= (others => '0');
+                val2_data<= (others => '0');
 
                                   
         elsif rising_edge(ip_clk) then
@@ -383,12 +393,22 @@ begin
 --                              TestRegs                
                                 when TestRegIn  => 
                                         TestRegIn_c                     <= Reg_Dout(15 downto 0);
-                                        test_data_set           <= '1';  
+                                        test_data_set           <= '1'; 
+                                        
+                                when Val1 =>
+                                       val1_data(15 downto 0)<=Reg_Dout(15 downto 0);
+                                       val1_data(30 downto 16)<=(others=>'0');
+                                       val1_data(31)<='1';  
+                                                      
+                                when Val2 =>
+                                              val2_data(15 downto 0)<=Reg_Dout(15 downto 0);
+                                              val2_data(30 downto 16)<=(others=>'0');
+                                              val2_data(31)<='1';                      
 
                 
-                when others             => null;
+                                when others             => null;
                                 
-                        end case;
+                                        end case;
                 
                                 
         -- Read 
@@ -430,7 +450,11 @@ begin
                                 when Hard_ID => Reg_Din <= X"0000000" & "00" & hardid;
 
 
-
+                                when ValSumm =>
+                                    Reg_Din         <= val_summ;
+                                          if val_summ(31) = '1' then
+                                                val_summ(31)<= '0';
+                                          end if;      
 
 
 
@@ -467,6 +491,12 @@ begin
                         TestRegOut_c(31)                        <= '1';                         -- test data out valid
                 end if; 
                 
+                
+                if val2_data(31)='1' and val1_data(31)='1' then
+                 val_summ(16 downto 0)<= val1_data(16 downto 0) + val2_data(16 downto 0);
+                 val_summ(30 downto 17)<=(others=>'0');
+                 val_summ(31)<='1';
+                end if;
                         
         end if;
 end process; 

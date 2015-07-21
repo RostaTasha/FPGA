@@ -275,8 +275,44 @@ int fpga_reg_test(int cur_it, int dev)
 int fpga_summ_test(int cur_it, int dev)
 {
 
-// WRITE YOUR CODE HERE
+	unsigned short write_value1 = 0, write_value2=0;
+	unsigned int read_value = 0;
+	unsigned int 	read_flag_and_value;
+	int RunCycles = 10000,t;
+	int ret_val, numErrors = 0;
 
+	write_value1 = (short)((rand() << 16) | rand());
+	if(fpga_write_user_reg(dev, VAL1, (unsigned int)write_value1) < 0)
+	return -1;
+	
+	
+	write_value2 = (short)((rand() << 16) | rand());
+	if(fpga_write_user_reg(dev, VAL2, (unsigned int)write_value2) < 0)
+	return -1;	
+	
+	
+	
+	// read data and valid status
+	t=0; 
+	while(t++<3) {
+		if(fpga_read_user_reg(dev, VALSUMM, &read_flag_and_value) < 0)
+		return -1;
+		if (read_flag_and_value & 0x80000000) 
+		break;
+	}
+	if (t>2) { // timeout
+		printf("Timeout error in Reg test\n"); 
+		return -6;
+	} 
+
+	read_value = read_flag_and_value & ~(0x80000000) ;
+	
+	if (write_value1+  write_value2 != read_value) {
+		printf("Data error in summ test, write1 = %d, write2 = %d read = %d\n",write_value1, write_value2, read_value); 
+		return -10;
+	}
+
+	
 
 	printf("\n\nSUMM TEST on iteration %d completed successfully!\n\n", cur_it);
 
