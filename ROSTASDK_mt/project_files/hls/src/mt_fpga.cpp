@@ -44,6 +44,36 @@ int mt_top(
 	two_floats tmp_buf[2*N_d];
 
 	uint32_t 	n_step 	= p1;
+	uint32_t 	coeff_sw=p2;
+	uint32_t N_d_cur=N_d_min;
+
+
+
+	switch(coeff_sw){
+	case 0:
+	N_d_cur = 1*N_d_min;
+	break;
+	case 1:
+	N_d_cur = 2*N_d_min;
+	break;
+	case 2:
+	N_d_cur = 3*N_d_min;
+	break;
+	case 3:
+	N_d_cur = 4*N_d_min;
+	break;
+	case 4:
+	N_d_cur = 5*N_d_min;
+	break;
+	default:
+	N_d_cur = 6*N_d_min;
+	break;
+
+
+
+
+
+	}
 	//bit 	 	heat_on 	= p2 & 0x00000001;
 
 	int k = 0; // ddr buffer index
@@ -75,9 +105,9 @@ int mt_top(
 	loop_in_1: for (int i=0; i<13; i++) {
 
 
-		memcpy(tmp_buf,(const two_floats*)(bus_ptr_i + i*N_d*2),N_d*2*sizeof(two_floats));
+		memcpy(tmp_buf,(const two_floats*)(bus_ptr_i + i*N_d_cur*2),N_d_cur*2*sizeof(two_floats));
 
-		loop_in_2: for (int j=0; j<N_d; j++) {
+		loop_in_2: for (int j=0; j<N_d_cur; j++) {
 
 			type[i][j] = 0;		// all dimer are type D for now
 
@@ -97,7 +127,7 @@ int mt_top(
 	// time loop
 	time_loop: for (int step=1; step <= (p1>>1); step++) {
 
-		l11: for (int j=0; j<N_d; j+=3){
+		l11: for (int j=0; j<N_d_cur; j+=3){
 
 			l21: for (int i=0; i<13; i++) {
 	#pragma HLS PIPELINE
@@ -109,7 +139,7 @@ int mt_top(
 				int i2 = (i==12)? 0 : (i+1);
 				int j2 = (i==12)? (j+3) : j;
 
-				calc_grad_update_coord(i, j, i2, pos, 0, 0, 0,
+				calc_grad_update_coord(i, j, i2, N_d_cur, pos, 0, 0, 0,
 
 								m1[i][j],   m1[i][j+1],   m1[i][j+2],			// central molecules
 								m1[i2][j2], m1[i2][j2+1], m1[i2][j2+2],			// left molecules
@@ -133,7 +163,7 @@ int mt_top(
 
 		// reverse order
 
-		l12: for (int j=0; j<N_d; j+=3){
+		l12: for (int j=0; j<N_d_cur; j+=3){
 
 			l22: for (int i=0; i<13; i++) {
 	#pragma HLS PIPELINE
@@ -145,7 +175,7 @@ int mt_top(
 				int i2 = (i==12)? 0 : (i+1);
 				int j2 = (i==12)? (j+3) : j;
 
-				calc_grad_update_coord(i, j, i2, pos, 0, 0, 0,
+				calc_grad_update_coord(i, j, i2, N_d_cur, pos, 0, 0, 0,
 
 								m2[i][j],   m2[i][j+1],   m2[i][j+2],			// central molecules
 								m2[i2][j2], m2[i2][j2+1], m2[i2][j2+2],			// left molecules
@@ -174,7 +204,7 @@ int mt_top(
 
 	k = 0;
 	loop_out_1: for (int i=0; i<13; i++) {
-		loop_out_2: for (int j=0; j<N_d; j++) 	{
+		loop_out_2: for (int j=0; j<N_d_cur; j++) 	{
 
 			tmp_buf[2*j].d0 = m1[i][j].x;
 			tmp_buf[2*j].d1 = m1[i][j].y;
@@ -184,7 +214,7 @@ int mt_top(
 		}
 
 
-		memcpy((two_floats *)(bus_ptr_i + i*N_d*2), tmp_buf,N_d*2*sizeof(two_floats));
+		memcpy((two_floats *)(bus_ptr_i + i*N_d_cur*2), tmp_buf,N_d_cur*2*sizeof(two_floats));
 	}
 
 	return 0;
@@ -223,6 +253,8 @@ void calc_grad_update_coord(
 					int i1, int j1,			// current molecule on the right
 
 					int i2,			// i index of molecule on the left
+
+					int N_d_cur,
 
 					bit pos,		// lowest monomer position in dimer: 0 - bottom, 1 - top
 
@@ -286,7 +318,7 @@ void calc_grad_update_coord(
 
 	for (int k=0; k<3; k++) {
 #pragma HLS UNROLL
-		if ((i1==12)&&(j1==(N_d-3))) {
+		if ((i1==12)&&(j1==(N_d_cur-3))) {
 			left_lat_r[k] = zero_3d;
 			c_lat_l[k]	= zero_3d;
 		} else {
@@ -310,7 +342,7 @@ void calc_grad_update_coord(
 	c_long_d[2] = long_d_tmp[1];
 
 
-	if (j1 == (N_d-3)) {
+	if (j1 == (N_d_cur-3)) {
 
 
 		c_long_u[2] = zero_3d;

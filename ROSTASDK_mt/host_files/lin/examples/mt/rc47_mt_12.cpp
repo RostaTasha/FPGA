@@ -313,7 +313,10 @@ vector<vector<float> >  & t_out
 
 	
 	//////////////////////////////////////////////////////////////////////////////
+	int temp = N_d/12-1; 
+	RD_WriteDeviceReg32m(dev, CNTRL_BAR, HLS_B,temp);
 	RD_WriteDeviceReg32m(dev, CNTRL_BAR, HLS_A, n_step);
+
 	
 	if (fpga_write_to_axi(dev, wr_buf, SIZE_DWORD*sizeof(two_floats), 0x20000000) < 0){
 		fprintf (stderr,"Error in fpga_write_to_axi\n");
