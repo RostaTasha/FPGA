@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Руководство пользователя SDK RC-47 1.0 : Базовое ядро</title>
+        <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body class="theme-default aui-theme-default">
+        <div id="page">
+            <div id="main" class="aui-page-panel">
+                <div id="main-header">
+                    <div id="breadcrumb-section">
+                        <ol id="breadcrumbs">
+                            <li class="first">
+                                <span><a href="index.html">Руководство пользователя SDK RC-47 1.0</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="17563997.html">Программное обеспечение ПЛИС Virtex-7</a></span>
+                            </li>
+                                                </ol>
+                    </div>
+                    <h1 id="title-heading" class="pagetitle">
+                                                <span id="title-text">
+                            Руководство пользователя SDK RC-47 1.0 : Базовое ядро
+                        </span>
+                    </h1>
+                </div>
+
+                <div id="content" class="view">
+                    <div class="page-metadata">
+                        
+        
+    
+        
+    
+        
+    
+            Created by <span class='author'> Yuri Rumyantsev</span>, last modified by <span class='editor'> Sergey Torchigin</span> on Apr 27, 2015
+                        </div>
+                    <div id="main-content" class="wiki-content group">
+                    <p>Все ПЛИС проекты состоят из двух частей, базового и пользовательского ядер. Базовое ядро включает в себя интерфейсную часть (Base IP - в текущей версии SDK называется rosta_pcie), которая присутствует во всех FPGA проектах, создаваемых в рамках RC47 SDK. Пользовательское ядро включает пользовательскую чать (User IP), которая разрабатывается пользователем. Базовое ядро используется для связи внутренней логики ПЛИС с внешним миром по следующим интерфейсам:</p><ul><li>PCI Express x4 gen2 - для связи с PCIe Switch</li><li>Control Bus - для связи с системной ПЛИС Spartan6</li></ul><p>
+
+<map id="gliffy-map-4489275-7029" name="gliffy-map-4489275-7029"></map>
+<table width="100%" class="gliffy-macro-table">
+    <tr>
+        <td >
+            <table class="gliffy-macro-inner-table">
+                <caption align="bottom">
+                                    </caption>
+                <tr>
+                    <td>
+                        <img style="border: none; width: 612px;" usemap="#gliffy-map-4489275-7029" src="attachments/3604533/4489276.png" alt="" class="gliffy-macro-image"/>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+</p><p> </p><h3 id="id-Базовоеядро-Базовоеядро">Базовое ядро</h3><p>Базовое ядро включает в себя:</p><ul><li>для реализации интерфейса PCI Express<ul><li>ядро <a href="http://www.xilinx.com/products/intellectual-property/7_SERIES_PCI_Express_Block.htm" class="external-link" rel="nofollow">Xilinx Integrated PCI Express Block</a> версии 2.1 </li><li>ядро <a href="http://192.168.0.163:8090/display/RKD/10000.+PCIe+Master+Engine+v1.0">PCIe Master Engine v1.0</a><br /><br /></li></ul></li><li>для связи через RC47 Control Bus с системной микросхемой Spartan6 (сервис и отладка)<ul><li> ядро <a href="http://192.168.0.163:8090/display/RKD/10002.+RC47+CBus+Engine+v1.0">RC47 CBus Engine v1.0</a></li></ul></li></ul><p>Характеристики интерфейса PCI Express:</p><ul><li>Ширина - х4</li><li>Скорость - gen2 (5 ГГц)</li><li>Области памяти 32 бита<ul><li>BAR0 64 КБайт</li><li>BAR1 1 МБайт</li></ul></li><li>Использует legacy прерывания</li></ul><p>Характеристики <strong>Xilinx PCIe AXI Stream Interface</strong></p><ul><li>Ширина шины данных - 64 бита</li><li>Частота - 250 МГц</li></ul><p> </p><h3 id="id-Базовоеядро-Интерфейспользовательскогоядра">Интерфейс пользовательского ядра </h3><p>Базовое ядро связано с пользовательским ядром через следующий аппаратный интерфейс:</p><p><div class="table-wrap"><table class="confluenceTable"><tbody><tr><th class="confluenceTh">Имя сигнала</th><th class="confluenceTh">Тип</th><th class="confluenceTh">Описание</th></tr><tr><td colspan="1" class="confluenceTd"><span>user_rst_n</span></td><td colspan="1" class="confluenceTd"><span>in</span></td><td colspan="1" class="confluenceTd"><p>Сигнал сброса для ядра User IP, активен 0.</p><p>Задается регистром BAR0 UserControlReg бит 0.</p></td></tr><tr><td colspan="1" class="confluenceTd">clk_in</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd"><p>Входная частота для блока. Источник - дифференциальный клок 100 МГц.</p><p>Пользователь может использовать ее, как источник частоты ip_clk.</p></td></tr><tr><td colspan="1" class="confluenceTd">clk_in2</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd"><p>Входная частота для блока. Источник - single-ended клок 100 МГц от микросхемы Spartan6.</p><p>Пользователь может использовать ее, как источник частоты ip_clk.</p></td></tr><tr><td class="confluenceTd">ip_clk</td><td class="confluenceTd">out</td><td class="confluenceTd"><p>Частота работы ядра User IP, формируется в ядре User IP.</p><p>Все сигналы User IP интерфейса синхронны с частотой ip_clk.</p></td></tr><tr><td class="highlight-grey confluenceTd" data-highlight-colour="grey"><strong>Register interface</strong></td><td class="highlight-grey confluenceTd" colspan="2" data-highlight-colour="grey">Инициатор - Master Engine</td></tr><tr><td colspan="1" class="confluenceTd">Reg_RE</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd">Строб чтения</td></tr><tr><td colspan="1" class="confluenceTd">Reg_WE</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd">Строб записи</td></tr><tr><td colspan="1" class="confluenceTd">Reg_Addr[7:0]</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd">Входная шина адреса</td></tr><tr><td colspan="1" class="confluenceTd">Reg_Dout[31:0]</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd">Входная шина данных</td></tr><tr><td colspan="1" class="confluenceTd">Reg_Din[31:0]</td><td colspan="1" class="confluenceTd">out</td><td colspan="1" class="confluenceTd">Выходная шина данных</td></tr><tr><td colspan="1" class="confluenceTd">Reg_Valid</td><td colspan="1" class="confluenceTd">out</td><td colspan="1" class="confluenceTd">Готовность данных</td></tr><tr><td class="highlight-grey confluenceTd" data-highlight-colour="grey"><strong>HOST RX FIFO</strong></td><td class="highlight-grey confluenceTd" colspan="2" data-highlight-colour="grey"><strong>Очередь для принятых с хоста данных </strong></td></tr><tr><td colspan="1" class="confluenceTd">host_rxd_s_tvalid</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd">Готовность данных (отправителя)</td></tr><tr><td colspan="1" class="confluenceTd">host_rxd_s_tready</td><td colspan="1" class="confluenceTd">out</td><td colspan="1" class="confluenceTd">Готовность получателя данных</td></tr><tr><td colspan="1" class="confluenceTd">host_rxd_s_tdata[63:0]</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd">Входная шина данных</td></tr><tr><td class="highlight-grey confluenceTd" data-highlight-colour="grey"><strong>HOST TX FIFO</strong></td><td class="highlight-grey confluenceTd" colspan="2" data-highlight-colour="grey"><strong>Очередь отправляемых на хост данных</strong></td></tr><tr><td colspan="1" class="confluenceTd">host_txd_m_tvalid</td><td colspan="1" class="confluenceTd">out</td><td colspan="1" class="confluenceTd"><span>Готовность данных (отправителя)</span></td></tr><tr><td colspan="1" class="confluenceTd">host_txd_m_tready</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd"><span>Готовность получателя данных</span></td></tr><tr><td colspan="1" class="confluenceTd">host_txd_m_tdata[63:0]</td><td colspan="1" class="confluenceTd">out</td><td colspan="1" class="confluenceTd"><span>Выходная шина данных</span></td></tr><tr><td class="highlight-grey confluenceTd" data-highlight-colour="grey"><strong>EP CMD</strong></td><td class="highlight-grey confluenceTd" colspan="2" data-highlight-colour="grey"><strong>Очередь команд для передачи данных между FPGA</strong></td></tr><tr><td colspan="1" class="confluenceTd">ep_tx_cmd_wr_en</td><td colspan="1" class="confluenceTd">out</td><td colspan="1" class="confluenceTd">Строб записи команды</td></tr><tr><td colspan="1" class="confluenceTd">ep_tx_cmd_data[63:0]</td><td colspan="1" class="confluenceTd">out</td><td colspan="1" class="confluenceTd"><p>Входная шина команды на передачу данных между FPGA.</p><p>ep_tx_cmd_data[63:32] - адрес обращения на PCIe.</p><p>ep_tx_cmd_data[31:8] - длина передачи в DWORDs (4 байта)</p><p>ep_tx_cmd_data[7:0] - Идентификатор (тэг) передачи.</p></td></tr><tr><td colspan="1" class="confluenceTd">ep_tx_cmd_full</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd">Очередь команд заполнена</td></tr><tr><td colspan="1" class="confluenceTd">ep_tx_error</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd">Сигнал ошибки передачи данных между FPGA</td></tr><tr><td colspan="1" class="confluenceTd">ep_tx_tag_error</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd">Идентификатор пакета, для которого была ошибка передачи</td></tr><tr><td class="highlight-grey confluenceTd" data-highlight-colour="grey"><strong>EP TX FIFO</strong></td><td class="highlight-grey confluenceTd" colspan="2" data-highlight-colour="grey"><strong>Очередь отправляемых на FPGA данных</strong></td></tr><tr><td colspan="1" class="confluenceTd">ep_txd_m_tvalid</td><td colspan="1" class="confluenceTd">out</td><td colspan="1" class="confluenceTd"><span>Готовность данных (отправителя)</span></td></tr><tr><td colspan="1" class="confluenceTd">ep_txd_m_tdata</td><td colspan="1" class="confluenceTd">out</td><td colspan="1" class="confluenceTd"><span>Готовность получателя данных</span></td></tr><tr><td colspan="1" class="confluenceTd">ep_txd_m_tready</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd"><span>Входная шина данных</span></td></tr><tr><td class="highlight-grey confluenceTd" data-highlight-colour="grey"><strong>EP RX FIFO</strong></td><td class="highlight-grey confluenceTd" colspan="2" data-highlight-colour="grey"><strong>Очередь для принятых от FPGA данных</strong></td></tr><tr><td colspan="1" class="confluenceTd">ep_rxd_s_tvalid</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd"><span>Готовность данных (отправителя)</span></td></tr><tr><td colspan="1" class="confluenceTd">ep_rxd_s_tready</td><td colspan="1" class="confluenceTd">out</td><td colspan="1" class="confluenceTd"><span>Готовность получателя данных</span></td></tr><tr><td colspan="1" class="confluenceTd">ep_rxd_s_tdata</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd"><span>Выходная шина данных</span></td></tr><tr><td class="highlight-grey confluenceTd" data-highlight-colour="grey"><strong>Reserved</strong></td><td class="highlight-grey confluenceTd" colspan="2" data-highlight-colour="grey"> </td></tr><tr><td colspan="1" class="confluenceTd">pcie_int_req</td><td colspan="1" class="confluenceTd">out</td><td colspan="1" class="confluenceTd"> </td></tr><tr><td colspan="1" class="confluenceTd">pcie_int_compl</td><td colspan="1" class="confluenceTd">in</td><td colspan="1" class="confluenceTd"> </td></tr></tbody></table></div><p> </p><p> </p></p><p> </p><p> </p>
+                    </div>
+
+                                        <div class="pageSection group">
+                        <div class="pageSectionHeader">
+                            <h2 id="attachments" class="pageSectionTitle">Attachments:</h2>
+                        </div>
+
+                        <div class="greybox" align="left">
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/17563998/17565213">base3</a> (application/gliffy+json)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/17563998/17565214.png">base3.png</a> (image/png)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/17563998/17565217">kvant-rosta-base</a> (application/gliffy+json)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/17563998/17565218.png">kvant-rosta-base.png</a> (image/png)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/17563998/17565223">kvant-rosta-base</a> (application/gliffy+json)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/17563998/17565224.png">kvant-rosta-base.png</a> (image/png)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/17563998/17565215">kvant-rosta-base</a> (application/gliffy+json)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/17563998/17565216.png">kvant-rosta-base.png</a> (image/png)
+                                <br/>
+                                                    </div>
+                    </div>
+                    
+                 
+                </div>             </div> 
+            <div id="footer" role="contentinfo">
+                <section class="footer-body">
+                    <p>Document generated by Confluence on Jul 20, 2015 13:39</p>
+                    <div id="footer-logo"><a href="http://www.atlassian.com/">Atlassian</a></div>
+                </section>
+            </div>
+        </div>     </body>
+</html>
