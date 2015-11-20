@@ -1,6 +1,8 @@
 
 #include "mt_cpu.h"
-
+#include <time.h>
+#include <stdlib.h>
+#include <limits.h>
  
 
 
@@ -23,9 +25,9 @@ float t_1[13][N_d];
 
 
 // во время дебага TOTAL_STEPS можно делать меньше
-#define STEPS_TO_WRITE		30000			// через это значение шагов сравниваем координаты и выводим в файл
+#define STEPS_TO_WRITE		10000000			// через это значение шагов сравниваем координаты и выводим в файл
 
-#define N				5			// количчество  запусков функций mt_cpu и mt_fpga
+#define N				200			// количчество  запусков функций mt_cpu и mt_fpga
 
 #define TOTAL_STEPS			(STEPS_TO_WRITE*N)		// полное количество шагов по времени
 
@@ -54,6 +56,18 @@ int main(int argc, char *argv[])
 		 printf("Error opening file!\n");
 		 return -1;
 	 }
+	 
+	 
+	srand(time(NULL));
+	//box_mull 	rg1((1 + (2 * rand ()) %ULONG_MAX),(1 + (2 * rand ()) %ULONG_MAX));
+	//box_mull	rg2((1 + (2 * rand ()) %ULONG_MAX),(1 + (2 * rand ()) %ULONG_MAX));
+	
+	int seeds[4*N_threads];
+	for (int i =0; i<4*N_threads; i++){
+	seeds[i]=rand();
+	}
+
+	
 
 
 	printf("TOTAL_STEPS = %d\nSTEPS_TO_WRITE = %d\n", TOTAL_STEPS, STEPS_TO_WRITE);
@@ -65,9 +79,16 @@ int main(int argc, char *argv[])
 
 
 
+	 int flag_seed;
+	 
+	 
 	 for(int k=0; k<N; k++) {
+	 
+	 flag_seed=(k==0) ? 1:0;
 
-		mt_cpu(STEPS_TO_WRITE,1,x_1,y_1,t_1,x_1,y_1, t_1);
+		//mt_cpu(STEPS_TO_WRITE,1,x_1,y_1,t_1,x_1,y_1, t_1,rg1,rg2);
+		
+		mt_cpu(STEPS_TO_WRITE,1,x_1,y_1,t_1,x_1,y_1, t_1,flag_seed,seeds);
 		
 		
 
@@ -92,13 +113,13 @@ void print_coords(FILE *f_p, float x[][N_d], float y[][N_d], float t[][N_d])
 
 	for (i=0; i<13; i++) {
 		for (j=0; j<N_d; j++)
-			fprintf(f_p,"%.2f\t  ", x[i][j]);
+			fprintf(f_p,"%.3f\t  ", x[i][j]);
 
 		for (j=0; j<N_d; j++)
-			fprintf(f_p,"%.2f\t  ", y[i][j]);
+			fprintf(f_p,"%.3f\t  ", y[i][j]);
 
 		for (j=0; j<N_d; j++)
-			fprintf(f_p,"%.2f\t  ", t[i][j]);
+			fprintf(f_p,"%.3f\t  ", t[i][j]);
 	}
 
 	fprintf(f_p,"\n");

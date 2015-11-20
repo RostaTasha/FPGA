@@ -6,10 +6,139 @@
 	#include <omp.h>
 #endif
 	
-#define N_threads 8
-//#define RunOpenMP
+
+#define RunOpenMP
 
 #include "mt_cpu.h"
+#include <assert.h>
+#include <algorithm>  
+
+class uni_num {
+
+
+
+
+public:
+//      uni_num(unsigned long seed) {
+//              mti=N_period+1;
+//              init_genrand(seed);
+//              valid = false;
+//      };
+        float get_uni_num(void);
+        void init_genrand(unsigned long seed);
+
+
+        unsigned long mt[N_period]; /* the array for the state vector  */
+        int mti;
+
+};
+
+
+
+
+
+void uni_num::init_genrand(unsigned long seed)
+{
+    mt[0]= seed & 0xffffffffUL;
+    for (mti=1; mti<N_period; mti++) {
+        mt[mti] =
+            (1812433253UL * (mt[mti-1] ^ (mt[mti-1] >> 30)) + mti);
+        mt[mti] &= 0xffffffffUL;
+        /* for >32 bit machines */
+    }
+
+
+};
+
+float uni_num::get_uni_num()
+{
+    unsigned long y;
+    static unsigned long mag01[2]={0x0UL, MATRIX_A};
+    /* mag01[x] = x * MATRIX_A  for x=0,1 */
+
+    if (mti >= N_period) { /* generate N_period words at one time */
+        int kk;
+
+
+        for (kk=0;kk<N_period-M_period;kk++) {
+            y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
+            mt[kk] = mt[kk+M_period] ^ (y >> 1) ^ mag01[y & 0x1UL];
+        }
+        for (;kk<N_period-1;kk++) {
+            y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
+            mt[kk] = mt[kk+(M_period-N_period)] ^ (y >> 1) ^ mag01[y & 0x1UL];
+        }
+        y = (mt[N_period-1]&UPPER_MASK)|(mt[0]&LOWER_MASK);
+        mt[N_period-1] = mt[M_period-1] ^ (y >> 1) ^ mag01[y & 0x1UL];
+
+        mti = 0;
+    }
+
+    y = mt[mti];
+    mti=mti+1;
+
+
+    /* Tempering */
+    y ^= (y >> 11);
+    y ^= (y << 7) & 0x9d2c5680UL;
+    y ^= (y << 15) & 0xefc60000UL;
+    y ^= (y >> 18);
+
+        y = (y==0) ? 1 : y;
+
+   return y*(1.0/4294967296.0);
+};
+
+
+
+uni_num ar_uni[4*N_threads];
+
+
+int is_nan(float val){
+ return (val!=val);
+}
+
+int inline get_norm_vals(int index, float *n0, float *n1) {
+
+
+
+        float r1, r2;
+        float logfs;
+        float mults, mults1;
+        float rho;
+        float d0, d1;
+        float sinfs, cosfs;
+
+
+		int tid = omp_get_thread_num();
+		//printf("tid is %d\n",tid);
+        r1 = ar_uni[tid*(2*index)].get_uni_num();
+        r2 = ar_uni[tid*(2*index + 1)].get_uni_num();
+
+
+
+        logfs = logf(r1);
+        mults = -2.0f * logfs;
+        rho = sqrtf(mults);
+
+        mults1=2*pii*r2;
+
+        sinfs=sinf(mults1);
+        cosfs=cosf(mults1);
+
+        d0 = rho*sinfs;
+        d1 = rho*cosfs;
+
+        *n0 = d0;
+        *n1 = d1;
+
+        //printf("%f %f\n", d0, d1);
+
+ return (is_nan(d0) || is_nan (d1));
+
+}
+
+
 void run_step_c();
 
 
@@ -84,13 +213,29 @@ void mt_cpu(	int		n_step,
 
 				float 	x_out[][N_d],		
 				float 	y_out[][N_d],
-				float 	t_out[][N_d]
+				float 	t_out[][N_d],
+				
+				int             flag_seed_c,
+
+                int seeds[]
+				
+				//box_mull & rg1,
+				//box_mull & rg2
 			)
 
 {
 	int i,j;
 
 
+	
+	   if ((flag_seed_c == 1)) {
+	   
+			printf("oki doki!");
+
+                for (int jj=0; jj<4*N_threads; jj++)
+                        ar_uni[jj].init_genrand(seeds[jj]);
+        } 
+	
 
 
 	if (load_coords) {
@@ -171,21 +316,49 @@ void mt_cpu(	int		n_step,
 		}
 
 	}
-	}
 
+
+//	float rand1, rand2, rand3,rand4;
+#pragma omp barrier
+	
+	int delta = N_d/(N_threads-1);
+	#ifdef RunOpenMP
+	int tid = omp_get_thread_num();
+	#endif
 	// update coordinates
-	for (j=1; j<N_d; j++)		// coordinates are fixed at j=0
+	#pragma omp for schedule(dynamic)   
+	#ifdef RunOpenMP
+	for (j=1+tid*delta; j<std::min(1+(tid+1)*delta, N_d); j++)		// coordinates are fixed at j=0
+	#else
+	for (j=1; j<N_d; j++)
+	#endif
 		for (i=0; i<13; i++) {
 		//#pragma HLS PIPELINE
+	//	rg1.get_rand_vals(&rand1, &rand2);
+	//	rg2.get_rand_vals(&rand3, &rand4);
+	float rand_buf[4];
+	
+           
+                if (get_norm_vals(0, &rand_buf[0], &rand_buf[1])!=0) {printf("NaN error!!!!\n");}
+				if (get_norm_vals(1, &rand_buf[2], &rand_buf[3])!=0) {printf("NaN error!!!!\n");}
+   
 
 			f_x = lat_l_x[i][j] + lat_r_x[i][j] + long_u_x[i][j] + long_d_x[i][j];
 			f_y = lat_l_y[i][j] + lat_r_y[i][j] + long_u_y[i][j] + long_d_y[i][j];
 			f_t = lat_l_t[i][j] + lat_r_t[i][j] + long_u_t[i][j] + long_d_t[i][j];
 
 
-			x[i][j] -= dt_viscPF * f_x;
-			y[i][j] -= dt_viscPF * f_y;
-			t[i][j] -= dt_viscPF_teta * f_t;
+			//printf("%f %f %f\n",rand1,rand2,rand3);
+			x[i][j] -= dt_viscPF * f_x			+  sqrt_PF_xy*rand_buf[0];///rand1*sqrt_PF_xy;
+			y[i][j] -= dt_viscPF * f_y		  	+ sqrt_PF_xy*rand_buf[1];///rand2*sqrt_PF_xy;
+			t[i][j] -= dt_viscPF_teta * f_t	  	+ sqrt_PF_teta*rand_buf[2];///rand3*sqrt_PF_teta;
+			//assert(x[i][j]==x[i][j]);
+			//assert(y[i][j]==y[i][j]);
+			//assert(t[i][j]==t[i][j]);
+		}
+
+#pragma omp barrier
+		
 		}
 	#ifdef RunOpenMP
 	}
@@ -194,12 +367,16 @@ void mt_cpu(	int		n_step,
 	t2=omp_get_wtime(); 
 	delta_t = t2 - t1;
 	printf("Elapsed time = %f\n", delta_t);
+	
+
+	
+	
 
 	for (i=0; i<13; i++)
 		for (j=0; j<N_d; j++) 	{
-			x_out[i][j] = x[i][j];
-			y_out[i][j] = y[i][j];
-			t_out[i][j] = t[i][j];
+			x_out[i][j] =  x[i][j];
+			y_out[i][j] =  y[i][j];
+			t_out[i][j] =  t[i][j];
 		}
 
 
@@ -255,8 +432,7 @@ void calc_grad_c(		int i1, 		// i index правой молекулы
 
 
 {
-#pragma HLS EXPRESSION_BALANCE
-#pragma HLS PIPELINE
+
 
 
 	// теперь PE_left - это индекс i2, а PF_right - индекс i1
@@ -274,6 +450,7 @@ void calc_grad_c(		int i1, 		// i index правой молекулы
 	float sin_t_3 = sinf(teta_3);
 
 	// swap i1 <=> i2
+	
 
 	float Ax_left = Ax_1[i2]*cos_t_A + Ax_3[i2]*sin_t_A - Ax_2[i2] +
 				(x_2 + R_MT) * A_Bx_4[i2];

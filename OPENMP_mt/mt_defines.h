@@ -13,9 +13,9 @@ typedef ap_uint<1> bit;
 typedef char bit;
 #endif
 
+#define N_threads 8
 
-
-#define N_d 13
+#define N_d 30
 
 
 #define viscPF       (4.3e-7*2)	//(1.1e-6  )		// (kcal/mol)*(s/nm^2)
@@ -75,6 +75,14 @@ typedef char bit;
 
 #define teta0_D 0.2f //rad
 #define teta0_T 0.0f
+
+
+
+#define sqrt_PF_xy              0.016669f
+#define sqrt_PF_teta    0.007207f
+
+#define pii 3.14159265359f
+
 
 
 const float Ax_1[13] = {-0.165214628f, 0.0561592989f, 0.264667839f, 0.412544012f, 0.465911359f, 0.412544012f, 0.264667839f, 0.0561594106f, -0.165214419f, -0.348739684f, -0.452372819f, -0.452372819f, -0.348739684f};
