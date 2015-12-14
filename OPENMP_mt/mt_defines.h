@@ -15,7 +15,7 @@ typedef char bit;
 
 #define N_threads 8
 
-#define N_d 30
+#define N_d 12
 
 
 #define viscPF       (4.3e-7*2)	//(1.1e-6  )		// (kcal/mol)*(s/nm^2)

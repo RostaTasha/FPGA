@@ -22,7 +22,8 @@ void mt_cpu(	int		n_step,				// полное количество шагов по времени
 				float 	y_out[][N_d],
 				float 	t_out[][N_d],
 				int             flag_seed_c,
-                int seeds[]
+                int seeds[],
+				bool ompflag
 				
 				//box_mull & rg1,
 				//box_mull & rg2

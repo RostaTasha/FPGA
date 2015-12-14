@@ -3,6 +3,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <iostream>
  
 
 
@@ -15,7 +16,7 @@ void print_coords(FILE *f_p, float x[][N_d], float y[][N_d], float t[][N_d]);
 
 
 						
-
+//#define COMPARE
 #define BUF_LEN_B		4096	
 
 
@@ -24,8 +25,13 @@ float y_1[13][N_d];
 float t_1[13][N_d];
 
 
+float x_11[13][N_d];
+float y_11[13][N_d];
+float t_11[13][N_d];
+
+
 // во время дебага TOTAL_STEPS можно делать меньше
-#define STEPS_TO_WRITE		10000000			// через это значение шагов сравниваем координаты и выводим в файл
+#define STEPS_TO_WRITE		1000000			// через это значение шагов сравниваем координаты и выводим в файл
 
 #define N				200			// количчество  запусков функций mt_cpu и mt_fpga
 
@@ -37,19 +43,10 @@ float t_1[13][N_d];
 	
 int main(int argc, char *argv[])
 {
-	int dev, ret_val;
-
-	
-	double dt_c[N];
-	double dt_f[N];
-
-	double t_cpu; 
-
-	 FILE *f_u, *f_p;
-	 int i,j;
-
+	 FILE  *f_p;
+	#ifdef COMPARE
 	 int error = 0;
-
+	#endif
 	 f_p = fopen ("MT_coords_CPU1.txt","w");
 	 if (f_p==NULL) {
 
@@ -70,11 +67,12 @@ int main(int argc, char *argv[])
 	
 
 
-	printf("TOTAL_STEPS = %d\nSTEPS_TO_WRITE = %d\n", TOTAL_STEPS, STEPS_TO_WRITE);
+	printf("TOTAL_STEPS = %d\nSTEPS_TO_WRITE = %d N_d = %d \n", TOTAL_STEPS, STEPS_TO_WRITE, N_d);
 
 
 
 	init_coords(x_1,y_1,t_1);
+	init_coords(x_11,y_11,t_11);
 
 
 
@@ -88,7 +86,11 @@ int main(int argc, char *argv[])
 
 		//mt_cpu(STEPS_TO_WRITE,1,x_1,y_1,t_1,x_1,y_1, t_1,rg1,rg2);
 		
-		mt_cpu(STEPS_TO_WRITE,1,x_1,y_1,t_1,x_1,y_1, t_1,flag_seed,seeds);
+		mt_cpu(STEPS_TO_WRITE,1,x_1,y_1,t_1,x_1,y_1, t_1,flag_seed,seeds,1);
+	#ifdef COMPARE
+		mt_cpu(STEPS_TO_WRITE,1,x_11,y_11,t_11,x_11,y_11, t_11,flag_seed,seeds,0);
+		if (compare_results(x_1, y_1, t_1, x_11, y_11, t_11)) std::cout<<"Compare errors"<<std::endl;
+	#endif
 		
 		
 

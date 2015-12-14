@@ -1,6 +1,6 @@
 CC=g++
-CFLAGS=-c -Wall -O3  -fopenmp
-LDFLAGS= -fopenmp -O3 -Wall
+CFLAGS=-c -Wall -O2  -fopenmp
+LDFLAGS= -fopenmp -O2 -Wall
 SOURCES=mt_cpu.cpp mt_app.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=mt_app

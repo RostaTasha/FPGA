@@ -12,6 +12,7 @@
 #include "mt_cpu.h"
 #include <assert.h>
 #include <algorithm>  
+#include <iostream>
 
 class uni_num {
 
@@ -143,7 +144,7 @@ void run_step_c();
 
 
 
-void calc_grad_c(		int i1, 		// i index правой молекулы
+inline void calc_grad_c(		int i1, 		// i index правой молекулы
 					int j1,			// j index правой молекулы
 
 					int i2,			// i index левой молекулы
@@ -180,6 +181,11 @@ void calc_grad_c(		int i1, 		// i index правой молекулы
 					float *grad_long_teta_3
 
 							);
+							
+							
+							
+
+							
 
 
 bit type[13][N_d];		
@@ -199,8 +205,6 @@ float long_u_x[13][N_d+1];
 float long_u_y[13][N_d+1];
 float long_u_t[13][N_d+1];
 
-float long_d_x[13][N_d+1];
-float long_d_y[13][N_d+1];
 float long_d_t[13][N_d+1];
 
 
@@ -217,7 +221,8 @@ void mt_cpu(	int		n_step,
 				
 				int             flag_seed_c,
 
-                int seeds[]
+                int seeds[],
+				bool ompflag
 				
 				//box_mull & rg1,
 				//box_mull & rg2
@@ -230,7 +235,7 @@ void mt_cpu(	int		n_step,
 	
 	   if ((flag_seed_c == 1)) {
 	   
-			printf("oki doki!");
+
 
                 for (int jj=0; jj<4*N_threads; jj++)
                         ar_uni[jj].init_genrand(seeds[jj]);
@@ -249,6 +254,10 @@ void mt_cpu(	int		n_step,
 				t[i][j] = t_in[i][j];
 			}
 	}
+	
+	
+
+							
 //	printf("\CPU\n*****************************************************************\n");
 //	for (i=0; i<13; i++) {
 //		for (j=0; j<N_d; j++) {
@@ -261,14 +270,20 @@ void mt_cpu(	int		n_step,
 
 
 
+
+
+
 	double t1= 0, t2 = 0, delta_t = 0; 	
 	t1=omp_get_wtime();
 	float f_x=0, f_y=0, f_t=0;
 	int thr_num = 0;
 	#ifdef RunOpenMP
 	//thr_num = omp_get_num_procs();
-	omp_set_num_threads(N_threads);
-	#pragma omp parallel default(shared) private(f_x, f_y, f_t)//for  schedule(static, 3) //default(none) firstprivate() shared() shared (x, lat_l_x, lat_l_y, lat_l_t, lat_r_x, lat_r_y, lat_r_t, long_u_x, long_u_y, long_u_t, long_d_x, long_d_y, long_d_t)
+	omp_set_nested(1);
+	omp_set_dynamic(0);
+	omp_set_num_threads(N_threads);	
+
+	#pragma omp parallel default(shared) private(f_x, f_y, f_t)  num_threads(N_threads) if (ompflag)//for  schedule(static, 3) //default(none) firstprivate() shared() shared (x, lat_l_x, lat_l_y, lat_l_t, lat_r_x, lat_r_y, lat_r_t, long_u_x, long_u_y, long_u_t, long_d_x, long_d_y, long_d_t)
 	{
 	#endif
 
@@ -278,87 +293,84 @@ void mt_cpu(	int		n_step,
 	//	printf("Number of threads = %d\n", omp_get_num_threads());
 	//	printf("Number of procs   = %d\n\n",omp_get_num_procs());
 	//}
+	
+
+		
+	
 
 
 	for (int step=1; step <= n_step; step++){
 
-		int i, j;
-		
-		bit pos = 0; 
+		//int i, j;
+	//omp_lock_t lock[13][N_d+3];	
+	//for (int i=0; i<13; i++)
+	//	for (int j=0; j<(N_d+3); i++)
+     //   omp_init_lock(&(lock[i][j]));
+	
 
 	/////////****Main parallel cycle********//////////	
-		
-	#pragma omp for schedule(dynamic)//collapse (2)
-	for (i=0; i<13; i++){
-		for (j=0; j<N_d; j++) {
-			int i2 = (i==12)? 0 : (i+1);
-			int j2 = (i==12)? (j+3) : j;
+	
+	
+	#pragma omp  for  schedule(static) collapse(2)
+	//#pragma omp simd
+	for (int j=0; j<N_d; j++){
 
-			calc_grad_c(i, j, i2, type[i][j],  pos,
+				for (int i=0; i<13; i++){
+				bit pos = j%2;
+				int i2 = (i==12)? 0 : (i+1);
+				int j2 = (i==12)? (j+3) : j;
+				
 
-							 x[i ][j],  y[i][j], t[i][j],											// mol1 (right) - правая молекула, для нее обновляем силы для взаимодействия слева и вверху
-
-							 x[i2][j2], y[i2][j2], t[i2][j2],										// mol2 (left) - молекуля слева по горизонтали, для нее обновляем силу взаимодейтствия справа
-
-							 x[i][j+1],  y[i][j+1], t[i][j+1],										// mol3 (up)  - молекула сверху по вертикали, для нее обновляем силу взаимодействия снизу
-
-							 &lat_l_x[i ][j], &lat_l_y[i ][j], &lat_l_t[i ][j],
-							 &lat_r_x[i2][j2], &lat_r_y[i2][j2], &lat_r_t[i2][j2],
-
-							 &long_u_x[i][j  ], &long_u_y[i][j  ], &long_u_t[i][j  ],
-							 &long_d_x[i][j+1], &long_d_y[i][j+1], &long_d_t[i][j+1]    );
-
-			if (pos==1)
-				pos = 0;
-			else
-				pos = 1;
-		
-		}
+	//			flags[i2][j2]+=1;
+	//			flags[i][j+1]+=1;
+				
+	
+	
+				calc_grad_c(i, j, i2, type[i][j],  pos,
+	
+								x[i ][j],  y[i][j], t[i][j],											// mol1 (right) - правая молекула, для нее обновляем силы для взаимодействия слева и вверху
+	
+								x[i2][j2], y[i2][j2], t[i2][j2],										// mol2 (left) - молекуля слева по горизонтали, для нее обновляем силу взаимодейтствия справа
+	
+								x[i][j+1],  y[i][j+1], t[i][j+1],										// mol3 (up)  - молекула сверху по вертикали, для нее обновляем силу взаимодействия снизу
+	
+								&lat_l_x[i ][j], &lat_l_y[i ][j], &lat_l_t[i ][j],
+								&lat_r_x[i2][j2], &lat_r_y[i2][j2], &lat_r_t[i2][j2],
+								&long_u_x[i][j  ], &long_u_y[i][j  ], &long_u_t[i][j  ],
+								NULL, NULL, &long_d_t[i][j+1]    );
 
 	}
-
-
-//	float rand1, rand2, rand3,rand4;
-#pragma omp barrier
+	}
 	
-	int delta = N_d/(N_threads-1);
-	#ifdef RunOpenMP
-	int tid = omp_get_thread_num();
-	#endif
-	// update coordinates
-	#pragma omp for schedule(dynamic)   
-	#ifdef RunOpenMP
-	for (j=1+tid*delta; j<std::min(1+(tid+1)*delta, N_d); j++)		// coordinates are fixed at j=0
-	#else
-	for (j=1; j<N_d; j++)
-	#endif
-		for (i=0; i<13; i++) {
-		//#pragma HLS PIPELINE
-	//	rg1.get_rand_vals(&rand1, &rand2);
-	//	rg2.get_rand_vals(&rand3, &rand4);
+
+	#pragma omp  for  schedule(static) collapse(2)
+	//#pragma omp simd
+	for (int j=1; j<N_d; j++){
+		for (int i=0; i<13; i++) {
+
 	float rand_buf[4];
+	
 	
            
                 if (get_norm_vals(0, &rand_buf[0], &rand_buf[1])!=0) {printf("NaN error!!!!\n");}
 				if (get_norm_vals(1, &rand_buf[2], &rand_buf[3])!=0) {printf("NaN error!!!!\n");}
    
 
-			f_x = lat_l_x[i][j] + lat_r_x[i][j] + long_u_x[i][j] + long_d_x[i][j];
-			f_y = lat_l_y[i][j] + lat_r_y[i][j] + long_u_y[i][j] + long_d_y[i][j];
+			float temp1= - long_u_x[i][j-1];
+			float temp2= - long_u_y[i][j-1];
+			f_x = lat_l_x[i][j] + lat_r_x[i][j] + long_u_x[i][j] + temp1;
+			f_y = lat_l_y[i][j] + lat_r_y[i][j] + long_u_y[i][j] + temp2;
 			f_t = lat_l_t[i][j] + lat_r_t[i][j] + long_u_t[i][j] + long_d_t[i][j];
 
 
-			//printf("%f %f %f\n",rand1,rand2,rand3);
-			x[i][j] -= dt_viscPF * f_x			+  sqrt_PF_xy*rand_buf[0];///rand1*sqrt_PF_xy;
-			y[i][j] -= dt_viscPF * f_y		  	+ sqrt_PF_xy*rand_buf[1];///rand2*sqrt_PF_xy;
-			t[i][j] -= dt_viscPF_teta * f_t	  	+ sqrt_PF_teta*rand_buf[2];///rand3*sqrt_PF_teta;
-			//assert(x[i][j]==x[i][j]);
-			//assert(y[i][j]==y[i][j]);
-			//assert(t[i][j]==t[i][j]);
+			x[i][j] -= dt_viscPF * f_x		+  sqrt_PF_xy*rand_buf[0];///rand1*sqrt_PF_xy;
+			y[i][j] -= dt_viscPF * f_y		+ sqrt_PF_xy*rand_buf[1];///rand2*sqrt_PF_xy;
+			t[i][j] -= dt_viscPF_teta * f_t	+ sqrt_PF_teta*rand_buf[2];///rand3*sqrt_PF_teta;
+
 		}
 
-#pragma omp barrier
 		
+		}
 		}
 	#ifdef RunOpenMP
 	}
@@ -372,8 +384,8 @@ void mt_cpu(	int		n_step,
 	
 	
 
-	for (i=0; i<13; i++)
-		for (j=0; j<N_d; j++) 	{
+	for (int i=0; i<13; i++)
+		for (int j=0; j<N_d; j++) 	{
 			x_out[i][j] =  x[i][j];
 			y_out[i][j] =  y[i][j];
 			t_out[i][j] =  t[i][j];
@@ -386,13 +398,10 @@ void mt_cpu(	int		n_step,
 
 
 
-void run_step_c()
-{}
 
 
 
-
-void calc_grad_c(		int i1, 		// i index правой молекулы
+inline  void calc_grad_c(		int i1, 		// i index правой молекулы
 					int j1,			// j index правой молекулы
 
 					int i2,			// i index левой молекулы
@@ -594,8 +603,8 @@ void calc_grad_c(		int i1, 		// i index правой молекулы
 		*grad_long_y_1 		= 0.0f;
 		*grad_long_teta_1	= 0.0f;
 
-		*grad_long_x_3 		= 0.0f;
-		*grad_long_y_3 		= 0.0f;
+		//*grad_long_x_3 		= 0.0f;
+		//*grad_long_y_3 		= 0.0f;
 		*grad_long_teta_3	= 0.0f;
 
 	} else {
@@ -604,8 +613,8 @@ void calc_grad_c(		int i1, 		// i index правой молекулы
 		*grad_long_y_1 		= Grad_tmp_y;
 		*grad_long_teta_1	= GradU_C_teta_1 + GradU_B_teta_1;
 
-		*grad_long_x_3 		= - Grad_tmp_x;
-		*grad_long_y_3 		= - Grad_tmp_y;
+		//*grad_long_x_3 		= - Grad_tmp_x;
+		//*grad_long_y_3 		= - Grad_tmp_y;
 		*grad_long_teta_3	= GradU_C_teta_3 + GradU_B_teta_3;
 
 
