@@ -1,0 +1,29 @@
+From:
+altera.com -> Downloads -> Quartus II Subscription Edition (with 30 day trial) -> Individual Files
+(You need the Subscription Edition, as the free Web edition doesn't support Virtual Pin assignments.)
+
+Download:
+* Quartus II Software (includes Nios II EDS)
+* Cyclone V device support
+
+Direct links:
+http://download.altera.com/akdlm/software/acdsinst/14.1/186/ib_installers/QuartusSetup-14.1.0.186-linux.run
+http://download.altera.com/akdlm/software/acdsinst/14.1/186/ib_installers/cyclonev-14.1.0.186.qdz
+
+Install and open our provided project file
+
+
+To check the timing of your design, find:
+Tasks (window on the left of the screen) -> TimeQuest Timing Analysis -> View Report
+
+Double click "View Report", and wait until finished.
+
+Check:
+Slow 1100mV 85C Model -> Fmax Summary -> Fmax
+Slow 1100mV 0C Model -> Fmax Summary -> Fmax
+
+These report your achieved frequency at two different temperatures. 
+Both should be above your target frequency. 
+They will be shown in red if target frequency is not met.
+
+

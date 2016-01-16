@@ -1,0 +1,29 @@
+
+Install tools (Ubuntu)
+sudo apt-get install binutils g++ gtkwave
+
+How to compile:
+source sourceme
+make
+
+How to run:
+./a.out
+
+How to view waveform:
+gtkwave simx.vcd               # view waveform
+
+
+Note:
+
+If you add or re-name any files, you'll have to update the Makefile accordingly
+
+If you are having problems, contact us as soon as possible! We don't want you to spend time
+on technical problems instead of working on the excercise :-)
+
+If you're on a 32-bit system (e.g. a virtual machine), you will have to re-build verilator:
+cd verilator*
+./configure
+make
+cd ..
+
+
