@@ -1,6 +1,6 @@
-1. Swarm64 Hardware Design Exercise
+1.  Hardware Design Exercise
 
-This is the Swarm64 exercise for hardware designers. It consists of two parts. The first part is to design and verify a digital module. The later part is to prototype the design with Altera Quartus II, optimize for performance and meet timing requirements. The target is a Cyclone V FPGA.
+This is the  exercise for hardware designers. It consists of two parts. The first part is to design and verify a digital module. The later part is to prototype the design with Altera Quartus II, optimize for performance and meet timing requirements. The target is a Cyclone V FPGA.
 
 A set of embryo files for the Verilog design, the C++ verification code and the Quartus project are provided in the archive accompanying this exercise. The file _quartus\_howto.txt_ which is also included contains instructions on how to install and configure Quartus, while _simulation\_howto.txt_ describes how to build and run a simulation and examine the waveform.
 
@@ -14,7 +14,7 @@ The task is to implement a calculator capable for three mathematical operations:
 
 **Valid/ack interface**
 
-This interface connects a sender (producing a datum) and a receiver (consuming a datum) in such a way that the sender and the receiver both have the ability to regulate the speed. The _valid_ signal go from the sender to the receiver, while the _ack_ signal goes from the receiver to the sender. Any number of additional signals can be present in order to transfer data from the sender to the receiver. _Valid_ high signifies that there is _valid_ data on these ports, while _ack_ signifies that the receiver has accepted the data. Thus, such transfer occurs if and only if both _ack_ and _valid_ are asserted at a rising clock edge. The _ack_ signal is combinatorial and based in part on the _valid_ signal – _ack_ should never be high unless _valid_ is also high.
+This interface connects a sender (producing a datum) and a receiver (consuming a datum) in such a way that the sender and the receiver both have the ability to regulate the speed. The _valid_ signal go from the sender to the receiver, while the _ack_ signal goes from the receiver to the sender. Any number of additional signals can be present in order to transfer data from the sender to the receiver. _Valid_ high signifies that there is _valid_ data on these ports, while _ack_ signifies that the receiver has accepted the data. Thus, such transfer occurs if and only if both _ack_ and _valid_ are asserted at a rising clock edge. The _ack_ signal is combinatorial and based in part on the _valid_ signal Â– _ack_ should never be high unless _valid_ is also high.
 
 
 
